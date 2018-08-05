@@ -1,5 +1,4 @@
 # Now we define all our functions
-
 def softmax(z):
     #Calculate exponent term first
     exp_scores = np.exp(z)
@@ -149,6 +148,14 @@ def calc_accuracy(model,x,y):
     return (m - error)/m * 100
 losses = []
 
+#normalise the inputed dataframe
+def normalise(dataframe):
+    result = dataframe.copy()
+    for feature_name in dataframe.columns:
+        max_value = dataframe[feature_name].max()
+        min_value = dataframe[feature_name].min()
+        result[feature_name] = (dataframe[feature_name] - min_value) / (max_value - min_value)
+    return result
 
 def train(model,X_,y_,learning_rate, epochs=20000, print_loss=False):
     # Gradient descent. Loop over epochs
@@ -174,3 +181,40 @@ def train(model,X_,y_,learning_rate, epochs=20000, print_loss=False):
             losses.append(accuracy_score(y_pred=y_hat,y_true=y_true)*100)
     return model
 
+#experimental training with optimised learning rates
+def train2(model,X_,y_,learning_rate, epochs=20000, print_loss=False):
+    learningMax = learning_rate
+    learningMin = .001
+    learning_rate = learningMax
+    learningOptimisationStep = learning_rate / epochs
+    print(learningOptimisationStep)
+    # Gradient descent. Loop over epochs
+    lastAccuracy = 0
+    momentum = 0
+    for i in range(0, epochs):
+        #update learning rate
+        learning_rate = learning_rate - learningOptimisationStep
+        #learning_rate = learningMin + (momentum*learningMax)
+        # Forward propagation
+        cache = forward_prop(model,X_)
+        #a1, probs = cache['a1'],cache['a2']
+        # Backpropagation
+        
+        grads = backward_prop(model,cache,y_)
+        # Gradient descent parameter update
+        # Assign new parameters to the model
+        model = update_parameters(model=model,grads=grads,learning_rate=learning_rate)
+    
+        # Pring loss & accuracy every 100 iterations
+        if print_loss and i % 100 == 0:
+            a3 = cache['a3']
+            print('Loss after iteration',i,':',softmax_loss(y_,a3),' LearnRate:',learning_rate)
+            y_hat = predict(model,X_)
+            y_true = y_.argmax(axis=1)
+            accScore = accuracy_score(y_pred=y_hat,y_true=y_true) 
+            momentum = accScore - lastAccuracy
+            print('Accuracy after iteration',i,':',accScore*100,'%')
+            print('momentum',(momentum*learningMax))
+            lastAccuracy = accScore
+            losses.append(accuracy_score(y_pred=y_hat,y_true=y_true)*100)
+    return model
