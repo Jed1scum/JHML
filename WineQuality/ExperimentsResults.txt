@@ -1,0 +1,143 @@
+Test 1:
+inputDimensions = 11
+hiddenDimensions = 14
+outputDimensions = 3
+learningRate = 1
+trainingCycles = 4500
+
+training accuracy = 87.99
+Test accracy = .79
+
+Test 2:
+inputDimensions = 11
+hiddenDimensions = 5
+outputDimensions = 3
+learningRate = .07
+trainingCycles = 4500
+
+training accuracy = 82.32
+Test accracy = .85
+
+Test 3:
+inputDimensions = 11
+hiddenDimensions = 2
+outputDimensions = 3
+learningRate = .07
+trainingCycles = 4500
+
+training accuracy = 82.32
+Test accracy = .85
+
+Test 4:
+inputDimensions = 11
+hiddenDimensions = 14
+outputDimensions = 3
+learningRate = .07
+trainingCycles = 4500
+
+training accuracy = 83.85
+Test accracy = .83
+
+Test 5:
+inputDimensions = 11
+hiddenDimensions = 14
+outputDimensions = 3
+learningRate = .07
+trainingCycles = 15000
+
+training accuracy = 83.85
+Test accracy = .83
+
+Test 6:
+inputDimensions = 11
+hiddenDimensions = 14
+outputDimensions = 3
+learningRate = .001
+trainingCycles = 15000
+
+training accuracy = 82.254
+Test accracy = .83
+
+Test 7:
+inputDimensions = 11
+hiddenDimensions = 14
+outputDimensions = 3
+learningRate = 1
+trainingCycles = 25000
+
+training accuracy = 95.13
+Test accracy = .79
+
+Test 8:
+inputDimensions = 11
+hiddenDimensions = 7
+outputDimensions = 3
+learningRate = 1
+trainingCycles = 25000
+
+training accuracy = 88.85
+Test accracy = .77
+
+Test 9:
+inputDimensions = 11
+hiddenDimensions = 14
+outputDimensions = 3
+learningRate = .5
+trainingCycles = 25000
+
+training accuracy = 88.85
+Test accracy = .71
+
+Test 10:
+inputDimensions = 11
+hiddenDimensions = 14
+outputDimensions = 3
+learningRate = 5
+trainingCycles = 25000
+
+training accuracy = 82.32
+Test accracy = .85
+
+Test 11:
+inputDimensions = 11
+hiddenDimensions = 14
+outputDimensions = 3
+learningRate = .7
+trainingCycles = 25000
+
+training accuracy = 90.4
+Test accracy = .82
+
+Test 12:
+inputDimensions = 11
+hiddenDimensions = 20
+outputDimensions = 3
+learningRate = .7
+trainingCycles = 25000
+
+training accuracy = 84.52
+Test accracy = .85
+
+Test 13:
+inputDimensions = 11
+hiddenDimensions = 20
+outputDimensions = 3
+learningRate = 1
+trainingCycles = 25000
+
+training accuracy = 93.32
+Test accracy = .82
+
+Test 14:
+inputDimensions = 11
+hiddenDimensions = 20
+outputDimensions = 3
+learningRate = 1
+trainingCycles = 40000
+
+training accuracy = 93.92
+Test accracy = .74
+
+Test12
+87
+85
