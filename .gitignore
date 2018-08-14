@@ -1,1 +1,6 @@
 venv36/
+ImageDatasetTools/tf_files/data
+ImageDatasetTools/tf_files/test
+ImageDatasetTools/.DS_Store
+ImageDatasetTools/.jpgdiscard
+ImageDatasetTools/.svgdiscard

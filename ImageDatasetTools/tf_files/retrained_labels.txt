@@ -1,0 +1,3 @@
+apple
+coffee_mug
+fork
