@@ -164,6 +164,7 @@ def label_image(file):
   input_operation = graph.get_operation_by_name(input_name);
   output_operation = graph.get_operation_by_name(output_name);
 
+
   with tf.Session(graph=graph) as sess:
     start = time.time()
     results = sess.run(output_operation.outputs[0],
@@ -179,5 +180,5 @@ def label_image(file):
   for i in top_k:
     resultText = template.format(labels[i], results[i])
     print(resultText)
-  return labels[top_k[0]]
+  return labels[top_k[0]],results[top_k[0]]
   #print(template.format(labels, results))
