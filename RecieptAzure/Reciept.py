@@ -23,7 +23,8 @@ vision_base_url = "https://australiaeast.api.cognitive.microsoft.com/vision/v2.0
 ocr_url = vision_base_url + "ocr"
 
 # Set image_url to the URL of an image that you want to analyze.
-image_url = "https://d85ecz8votkqa.cloudfront.net/support/help_center/Print_Payment_Receipt.JPG"
+image_url = "https://media-cdn.tripadvisor.com/media/photo-s/0f/12/7d/69/bill-for-2-april-2017.jpg"
+#"https://d85ecz8votkqa.cloudfront.net/support/help_center/Print_Payment_Receipt.JPG"
 "http://media-s3-us-east-1.ceros.com/ozy/images/2017/12/15/cd09ad332e974fd19dba422a130a313b/convo-1-text-13.png"
 #"https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/" + \ "Broadway_and_Times_Square_by_night.jpg/450px-Broadway_and_Times_Square_by_night.jpg"
 
@@ -40,7 +41,7 @@ response.raise_for_status()
 # relevant caption for the image is obtained from the 'description' property.
 analysis = response.json()
 #print(json.dumps(response.json()))
-print(analysis)
+#print(analysis)
 # Extract the word bounding boxes and text.
 line_infos = [region["lines"] for region in analysis["regions"]]
 word_infos = []
@@ -63,5 +64,40 @@ for word in word_infos:
     plt.text(origin[0], origin[1], text, fontsize=5, weight="bold", va="top")
 plt.axis("off")
 
+def wordInline(line):
+	lineText = []
+	for word_metadata in line:
+		lineText.append(word_metadata['text'])
+	return lineText
+	
+def isFloatCurrency(word):
+	try:
+		float(word)
+		try:
+			int(word)
+			return False
+		except ValueError:
+			return True
+	except ValueError:
+		return False
+	return value
 
+def FindTotalPrice(data):
+	line_infos = data
+	for line in line_infos:
+		thisLine = []
+		prices = []
+		for word_metadata in line:
+			for word_info in word_metadata["words"]:
+				currentBoudingX = word_info['boundingBox']
+				thisLine.append(word_info)
+		theseWords = wordInline(thisLine)
+		for word in theseWords:
+			if(isFloatCurrency(word)):
+				prices.append(float(word))
+		if(len(prices) >0):
+			highest = max(prices)
+			print(highest)
+
+FindTotalPrice(line_infos)
 plt.show()
