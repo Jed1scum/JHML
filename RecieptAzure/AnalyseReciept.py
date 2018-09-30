@@ -25,6 +25,7 @@ def main(argv):
    			outputfile = arg
    AnalyseFolder(inputfolder)
 
+#save dataframe DF to a csv
 def SaveDFToCSV(df, path):
 	print("save to csv "+path)
 	try:
@@ -32,6 +33,7 @@ def SaveDFToCSV(df, path):
 	except ValueError:
 		print("Can't save df")
 
+#search a folder for files, and apply the analysefile method on each file.
 def AnalyseFolder(path):
 	thisPath = path
 	for file in os.listdir(path):
@@ -39,22 +41,32 @@ def AnalyseFolder(path):
 		print("Analyse: "+ filePath)
 		AnalyseFile(filePath)
 
-
+#run a few different methods on the file such as
+#RequestOCRPRocessing to return the text found in an image
+#SearchDataForDecimal to return any text that looks like it may be a price
+#SearchForDescription to return anything that looks like it may help describe what the reciept was for
+#SearchForDate to return anything that looks like a date
+#<TODO> improve the contrast on the image using openCV. some reciepts are not having all the text picked up
+#<TODO> find the vendor based on a dict of known vendors
+#<TODO> Itemise the purchases and somehow save those
+#<TODO> Validate the total price. It is making some big assumptions that the total is the highest decimal number found which isn't always the case
 def AnalyseFile(path):
-
+	showResult = True
 	thisUrl = path
 	#"https://media-cdn.tripadvisor.com/media/photo-s/0f/12/7d/69/bill-for-2-april-2017.jpg"    
-	requestData = Reciept.RequestOCRProcessing(thisUrl,False)
-
+	requestData = Reciept.RequestOCRProcessing(thisUrl,showResult)
 	priceList = Reciept.SearchDataForDecimal(requestData)
 	descriptionList = Reciept.SearchForDescription(requestData)
-
 	highestPrice = Reciept.GetHighest(priceList)
-	date = datetime.datetime.now()
+	date = Reciept.SearchForDate(requestData)
+	date = date[0]
 
-	priceData = [[date,path,descriptionList,highestPrice]]
+	ccType = Reciept.SearchForCCType(requestData)
+	ccType = ''.join(ccType)
 
-	df = pd.DataFrame(priceData, columns=['Date','FileName','Description','Total'])
+	priceData = [[date,path,descriptionList,ccType,highestPrice]]
+
+	df = pd.DataFrame(priceData, columns=['Date','FileName','Description','CCType','Total'])
 	#convert the list to be a string
 	df['Description'] = df['Description'].apply(lambda x: ','.join(map(str, x)))
 	#print(priceList)
@@ -67,7 +79,8 @@ def AnalyseFile(path):
 	else:
 		print("No csv exisits")
 		newDF = df
-
+	if(showResult):
+		print(str(date)+' | '+ str(ccType) + ' | '+ str(highestPrice))
 	SaveDFToCSV(newDF, csvFileName)
 
 

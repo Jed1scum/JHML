@@ -1,4 +1,6 @@
 import requests
+#help from
+#https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/quickstarts/python-disk
 # If you are using a Jupyter notebook, uncomment the following line.
 #%matplotlib inline
 import matplotlib.pyplot as plt
@@ -7,6 +9,7 @@ from matplotlib.patches import Rectangle
 from PIL import Image
 from io import BytesIO
 import os
+import datefinder
 
 # Replace <Subscription Key> with your valid subscription key.
 subscription_key = "2eaebc8c15a84418a9766a3f3b20ca40"
@@ -46,7 +49,7 @@ def RequestOCRProcessing(url,showResult):
 	params  = {'language': 'unk', 'detectOrientation': 'true'}
 	#{'mode': 'Categories,Description,Color'}
 	data    = {'url': image_url}
-
+	image_data = []
 	#if we can simply open the url/path then its a path to a local file. Otherwise treat it as a url
 	if os.path.exists(url):
 		headers = {'Content-Type': 'application/octet-stream','Ocp-Apim-Subscription-Key': subscription_key }
@@ -74,7 +77,12 @@ def RequestOCRProcessing(url,showResult):
 	
 	if(showResult):
 		plt.figure(figsize=(5, 5))
-		image = Image.open(BytesIO(requests.get(image_url).content))
+		#try to open the local file, otherwise its probably a url
+		try:
+			image = Image.open(BytesIO(requests.get(image_url).content))
+		except ValueError:
+			image = Image.open(BytesIO(image_data))
+
 		ax = plt.imshow(image, alpha=0.5)
 		for word in word_infos:
 			bbox = [int(num) for num in word["boundingBox"].split(",")]
@@ -111,11 +119,13 @@ def SearchDataForDecimal(data):
 		thisGroup.append(text)
 		
 		for word in thisGroup:
+			#also strip out any dollar signs found
+			word = word.strip('$')
 			if(isDecimalType(word)):
 				prices.append(float(word))
 	
 	return prices
-
+#Search a data structure of text and pull out anything that looks like it may help describe what the reciept was used for
 def SearchForDescription(data):
 	wordGroups = data
 	description = []
@@ -131,6 +141,61 @@ def SearchForDescription(data):
 			description.append(word)
 	#print(description)
 	return description
+
+#search the datastructure for anything that resembles a date. for what ever reason i can't work out it returns the current date with the detected date. 
+#when the return value is passed you can just select the first element. If i do it in the current method it throws an error
+def SearchForDate(data):
+	wordGroups = data
+	dateData = []
+	allData = []
+	index = 0
+	for group in wordGroups:
+		index +=1
+		thisGroup= []
+		text = group['text']
+		currentBouding = group['boundingBox']
+		thisGroup.append(text)
+		for word in thisGroup:
+			#if(isDecimalType(word)):
+			#use datefinder to see if the word is a date, if it is we will save it out
+			matches = list(datefinder.find_dates(word))
+			allData.append(word)
+			if len(matches) > 0:
+				firstMatches = matches[0].strftime("%x")
+				dateData.append(firstMatches)
+	#if we didn't find any dates, i.e. the image was blurry or nothing to find, then just put an unknown
+	if(len(dateData)==0):
+		dateData.append("Unknown")
+	return dateData
+
+def SearchForCCType(data):
+	wordGroups = data
+	ccData = []
+	allData = []
+	index = 0
+	ccList = ['visa','mastercard', 'master card', 'amex', 'american express', 'nabvisa']
+	for group in wordGroups:
+		index +=1
+		thisGroup= []
+		text = group['text']
+		currentBouding = group['boundingBox']
+		thisGroup.append(text)
+		for word in thisGroup:
+			#if(isDecimalType(word)):
+			#use WordInDict to see if the word is a matching with a cc type
+			if(WordInDict(word,ccList)):
+				ccData.append(word)
+	#if we didn't find any dates, i.e. the image was blurry or nothing to find, then just put an unknown
+	if(len(ccData)==0):
+		ccData.append("Unknown")
+	return ccData
+
+def WordInDict(word, dict):
+	#convert the word to lowercase to make this even
+	if word.lower() in dict:
+		return True
+	else:
+		return False
 #given a list of numbers, retur the highest one
 def GetHighest(data):
 	highest = []
